@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="DbContexts\Models\" />
+    <Folder Include="DTO\" />
   </ItemGroup>
 
 </Project>
