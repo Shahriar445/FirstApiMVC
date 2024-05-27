@@ -1,0 +1,1 @@
+﻿Scaffold-DbContext "Data Source=DESKTOP-PM9DUD3;Initial Catalog=Shop;Integrated Security=True;Trust Server Certificate=True" Microsoft.EntityFrameWorkCore.SqlServer -outputdir DBContexts/Models -context ShopDbContext -contextdir DbContexts -DataAnnotations -Force
