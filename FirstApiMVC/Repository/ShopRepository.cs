@@ -10,62 +10,10 @@ namespace FirstApiMVC.Repository
     public class ShopRepository : IShopRepository
     {
         private readonly ShopDbContext _context;
-
         public ShopRepository(ShopDbContext context)
         {
             _context = context;
         }
-
-        // -----------------------------Single item-------------------------------------------
-        /*  public async Task<string> CreateItem(ItemDto item)
-          {
-              string message = "";
-              try
-              {
-
-                  var data =await _context.Items.Where(e=>e.ItemId== item.ItemId).FirstOrDefaultAsync();
-                  if (data!= null)
-                  {
-                      var e= await _context.Items.Where(e=> e.ItemName.ToLower().Trim() == item.ItemName.ToLower().Trim()).FirstOrDefaultAsync();
-                      if (e != null)
-                      {
-                          throw new Exception("Item already Created");
-                      }
-                      data.ItemName = item.ItemName;
-                      data.NumStockQuantity = item.NumStockQuantity;
-                      data.IsActive = item.IsActive;
-
-                      _context.Items.Update(data);
-                      message = "Updated";
-                  }
-                  else
-                  {
-                      var e = await _context.Items.Where(e => e.ItemName.ToLower().Trim() == item.ItemName.ToLower().Trim()).FirstOrDefaultAsync();
-                      if (e != null)
-                      {
-                          throw new Exception("Item already Created");
-                      }
-                      Item i = new Item();
-                      i.ItemName = item.ItemName;
-                      i.NumStockQuantity=item.NumStockQuantity;
-                      i.IsActive= item.IsActive;
-
-                      await _context.Items.AddAsync(i);
-                      message = "Successful Create Item";
-                  }
-                  await _context.SaveChangesAsync();
-
-              }
-              catch (Exception ex)
-              {
-                  throw ex;
-
-              }
-              return message;
-          }
-
-        */
-
         // ---------------------------------Multiple  item List ---------------------------------------
         public async Task<string> CreateItems(ItemListDto itemListDto)
         {
@@ -77,7 +25,6 @@ namespace FirstApiMVC.Repository
             }
             return string.Join("; ", messages);
         }
-
         // --------------------------------- Create item ---------------------------------------
         private async Task<string> CreateOrUpdateItem(ItemDto item)
         {
@@ -130,11 +77,7 @@ namespace FirstApiMVC.Repository
 
             return message;
         }
-
-
-
         // --------------------------------- Create Partner ---------------------------------------
-
         public async Task<string> CreatePartnerType(PartnerTypeDto _partnerType)
         {
 
@@ -186,59 +129,47 @@ namespace FirstApiMVC.Repository
             }
             return message;
         }
-
-
-
-        // ---------------------------------Update Item---------------------------------------
-        public async Task<ItemDto> UpdateItem(int Id, ItemDto item)
+        // ---------------------------------Update list---------------------------------------
+        public async Task<string> UpdateItems(List<ItemDto> items)
         {
-            var message = "";
+            string message = "Items updated successfully";
             try
             {
-
-                var data = await _context.Items.Where(e => e.ItemId == Id).FirstOrDefaultAsync();
-                if (data == null)
+                foreach (var itemDto in items)
                 {
-                    return null;
-                }
-                if (data != null)
-                {
-                   
-
-
-                    var e = await _context.Items.Where(e => e.ItemName.ToLower().Trim() == item.ItemName.ToLower().Trim()).FirstOrDefaultAsync();
-                    if (e != null)
+                    var item = await _context.Items.Where(e => e.ItemId == itemDto.ItemId).FirstOrDefaultAsync();
+                    if (item == null)
                     {
-                        throw new Exception("Item already have in db");
+                        throw new Exception($"Item with ID {itemDto.ItemId} not found");
                     }
-                    data.ItemName = item.ItemName;
-                    data.NumStockQuantity = item.NumStockQuantity;
-                    data.IsActive = item.IsActive;
 
-                    _context.Items.Update(data);
-                    message = "Updated";
+                    var duplicateItem = await _context.Items
+                        .Where(e => e.ItemName.ToLower().Trim() == itemDto.ItemName.ToLower().Trim() && e.ItemId != itemDto.ItemId)
+                        .FirstOrDefaultAsync();
+                    if (duplicateItem != null)
+                    {
+                        throw new Exception($"Item with name {itemDto.ItemName} already exists");
+                    }
+
+                    item.ItemName = itemDto.ItemName;
+                    item.NumStockQuantity = itemDto.NumStockQuantity;
+                    item.IsActive = itemDto.IsActive;
+
+                    _context.Items.Update(item);
                 }
 
                 await _context.SaveChangesAsync();
-
-                var updatedData = await (from d in _context.Items
-                                         select new ItemDto
-                                         {
-                                             ItemId = d.ItemId,
-                                             ItemName = d.ItemName == null ? "" : d.ItemName,
-                                             NumStockQuantity = d.NumStockQuantity ,
-                                             
-                                             IsActive = d.IsActive
-
-                                         }).FirstOrDefaultAsync();
-                return updatedData;
-
             }
-            catch(Exception e)
+            catch (Exception ex)
             {
-                throw e;
+                throw new Exception($"Error updating items: {ex.Message}");
             }
-        }
 
+            return message;
+        }
     }
 }
+
+   
+
+
