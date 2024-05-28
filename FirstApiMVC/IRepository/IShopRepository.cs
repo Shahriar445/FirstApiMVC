@@ -5,7 +5,8 @@ namespace FirstApiMVC.IRepository
 {
     public interface IShopRepository
     {
-        Task<string> CreateItem(ItemDto item);
+        
+        Task<string> CreateItems(ItemListDto itemListDto);
         Task<ItemDto> UpdateItem(int Id,ItemDto item);
         Task<string>CreatePartnerType(PartnerTypeDto partnerType);
     }

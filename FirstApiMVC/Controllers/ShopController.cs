@@ -21,22 +21,9 @@ namespace FirstApiMVC.Controllers
             _logger = logger;
             _shopRepo = shopRepo;
         }
-       
-        [HttpPost("/CreateItem")]
-        public async Task<IActionResult> CreateItem(ItemDto item)
-        {
-            try
-            {
-                var createItem = await _shopRepo.CreateItem(item);
-                return StatusCode(StatusCodes.Status201Created, createItem);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
-            }
 
-        }
 
+        // ---------------------------------PartnerType---------------------------------------
         [HttpPost("/CreatePartnerType")]
         public async Task<IActionResult> CreatePartnerType(PartnerTypeDto partnertype)
         {
@@ -51,7 +38,7 @@ namespace FirstApiMVC.Controllers
             }
 
         }
-
+        // ---------------------------------Update items---------------------------------------------------
         [HttpPut("/Update")]
         public async Task<IActionResult> UpdateItem(int Id ,ItemDto item)
         {
@@ -77,6 +64,23 @@ namespace FirstApiMVC.Controllers
             }
         }
 
+        //----------------------------------------------Create Items --------------------------------------
+
+        [HttpPost("CreateItems")]
+        public async Task<IActionResult> CreateItems(ItemListDto itemListDto)
+        {
+            try
+            {
+                var result = await _shopRepo.CreateItems(itemListDto);
+                return StatusCode(StatusCodes.Status201Created, result);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
     }
 
 }
+
+

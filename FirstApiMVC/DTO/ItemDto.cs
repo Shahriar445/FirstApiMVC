@@ -3,6 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FirstApiMVC.DTO
 {
+    public class ItemListDto
+    {
+        public List<ItemDto> Items { get; set; }
+    }
     public class ItemDto
     {
         [Key]
