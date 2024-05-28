@@ -42,8 +42,8 @@ namespace FirstApiMVC.Controllers
         {
             try
             {
-                var createItem = await _shopRepo.CreatePartnerTypeT(partnertype);
-                return StatusCode(StatusCodes.Status201Created, createItem);
+                var createPartner = await _shopRepo.CreatePartnerType(partnertype);
+                return StatusCode(StatusCodes.Status201Created, createPartner);
             }
             catch (Exception e)
             {

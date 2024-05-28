@@ -61,7 +61,7 @@ namespace FirstApiMVC.Repository
             return message;
         }
        
-        public async Task<string> CreatePartnerTypeT(PartnerTypeDto _partnerType)
+        public async Task<string> CreatePartnerType(PartnerTypeDto _partnerType)
         {
 
             string message = "";
