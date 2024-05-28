@@ -22,7 +22,7 @@ namespace FirstApiMVC.Controllers
             _shopRepo = shopRepo;
         }
        
-        [HttpPost( Name = "CreateItem")]
+        [HttpPost("/CreateItem")]
         public async Task<IActionResult> CreateItem(ItemDto item)
         {
             try
@@ -35,6 +35,30 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
 
+        }
+        [HttpPut("/Update")]
+        public async Task<IActionResult> UpdateItem(int Id ,ItemDto item)
+        {
+            try
+            {
+
+                var createdItem = await _shopRepo.UpdateItem(Id, item);
+
+                if (createdItem == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, "Item with id :" + Id + " was not found");
+                }
+                else  
+                {
+                    return Ok(createdItem);
+                }
+
+
+            }
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
     }

@@ -61,6 +61,54 @@ namespace FirstApiMVC.Repository
             return message;
         }
 
+        public async Task<ItemDto> UpdateItem(int Id, ItemDto item)
+        {
+            var message = "";
+            try
+            {
 
+                var data = await _context.Items.Where(e => e.ItemId == Id).FirstOrDefaultAsync();
+                if (data == null)
+                {
+                    return null;
+                }
+                if (data != null)
+                {
+                   
+
+
+                    var e = await _context.Items.Where(e => e.ItemName.ToLower().Trim() == item.ItemName.ToLower().Trim()).FirstOrDefaultAsync();
+                    if (e != null)
+                    {
+                        throw new Exception("Item already have in db");
+                    }
+                    data.ItemName = item.ItemName;
+                    data.NumStockQuantity = item.NumStockQuantity;
+                    data.IsActive = item.IsActive;
+
+                    _context.Items.Update(data);
+                    message = "Updated";
+                }
+
+                await _context.SaveChangesAsync();
+
+                var updatedData = await (from d in _context.Items
+                                         select new ItemDto
+                                         {
+                                             ItemId = d.ItemId,
+                                             ItemName = d.ItemName == null ? "" : d.ItemName,
+                                             NumStockQuantity = d.NumStockQuantity ,
+                                             
+                                             IsActive = d.IsActive
+
+                                         }).FirstOrDefaultAsync();
+                return updatedData;
+
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
     }
 }
