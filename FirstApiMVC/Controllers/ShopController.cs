@@ -1,4 +1,5 @@
 ﻿using FirstApiMVC.DBContexts.Models;
+using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace FirstApiMVC.Controllers
         }
        
         [HttpPost( Name = "CreateItem")]
-        public async Task<IActionResult> CreateItem(Item item)
+        public async Task<IActionResult> CreateItem(ItemDto item)
         {
             try
             {
