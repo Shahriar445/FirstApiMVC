@@ -36,6 +36,22 @@ namespace FirstApiMVC.Controllers
             }
 
         }
+
+        [HttpPost("/CreatePartnerType")]
+        public async Task<IActionResult> CreatePartnerType(PartnerTypeDto partnertype)
+        {
+            try
+            {
+                var createItem = await _shopRepo.CreatePartnerTypeT(partnertype);
+                return StatusCode(StatusCodes.Status201Created, createItem);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+
+        }
+
         [HttpPut("/Update")]
         public async Task<IActionResult> UpdateItem(int Id ,ItemDto item)
         {

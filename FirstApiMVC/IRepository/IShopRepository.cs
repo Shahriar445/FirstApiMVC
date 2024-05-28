@@ -7,5 +7,6 @@ namespace FirstApiMVC.IRepository
     {
         Task<string> CreateItem(ItemDto item);
         Task<ItemDto> UpdateItem(int Id,ItemDto item);
+        Task<string>CreatePartnerTypeT(PartnerTypeDto partnerType);
     }
 }
