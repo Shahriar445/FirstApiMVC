@@ -9,6 +9,6 @@ namespace FirstApiMVC.IRepository
         Task<string> CreateItems(ItemListDto itemListDto);
         Task<string> UpdateItems(List<ItemDto> items);
        
-        Task<string> CreatePartner(string partnerName, string partnerTypeName, bool? isActive);
+        Task<string> CreatePartner(PartnerDto _partnerdto);
     }
 }

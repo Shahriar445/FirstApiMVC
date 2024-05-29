@@ -117,42 +117,48 @@ namespace FirstApiMVC.Repository
             return message;
         }
 
-
-
         // ---------------------------------Partner Details ---------------------------------------
 
-        public async Task<string> CreatePartner(string partnerName, string partnerTypeName, bool? isActive)
+        public async Task<string> CreatePartner(PartnerDto _partnerdto)
         {
             try
             {
-                // Fetch Partner Type Id based on the provided Partner Type name
-                var partnerType = await _context.PartnerTypes.FirstOrDefaultAsync(p => p.PartnerTypeName.ToLower() == partnerTypeName.ToLower());
+
+                if (string.IsNullOrEmpty(_partnerdto.PartnerName))
+                {
+                    throw new ArgumentException("Partner Name can't empty!");
+                }
+                if (string.IsNullOrEmpty(_partnerdto.PartnerTypeName))
+                {
+                    throw new ArgumentException("Partner Type can't empty!");
+                }
+                // catch PartnerType Id based on given Partner  name
+                var partnerType = await _context.PartnerTypes.FirstOrDefaultAsync(p => p.PartnerTypeName.ToLower() == _partnerdto.PartnerTypeName.ToLower());
                 if (partnerType == null)
                 {
-                    // Create new Partner Type if it doesn't exist
+                    //  PartnerType if not there in db
                     partnerType = new PartnerType
                     {
-                        PartnerTypeName = partnerTypeName,
-                        IsActive = isActive,
+                        PartnerTypeName = _partnerdto.PartnerTypeName,
+                        IsActive = _partnerdto.IsActive,
                         
                     };
                     await _context.PartnerTypes.AddAsync(partnerType);
                     await _context.SaveChangesAsync();
                 }
-                // Create new Partner entity
+                //  Partner 
                 var partner = new Partner
                 {
-                    PartnerName = partnerName,
+                    PartnerName = _partnerdto.PartnerName,
                     PartnerTypeId = partnerType.PartnerTypeId,
-                    IsActive = isActive
+                    IsActive = _partnerdto.IsActive,
                 };
                
 
-                // Add the new Partner to the database
+                 
                 await _context.Partners.AddAsync(partner);
                 await _context.SaveChangesAsync();
-
-                return "Partner created successfully.";
+                return $"Partner Name '{_partnerdto.PartnerName}'& Partner Type '{_partnerdto.PartnerTypeName}' created successfully.";
             }
             catch (Exception ex)
             {
