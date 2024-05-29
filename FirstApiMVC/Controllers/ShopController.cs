@@ -84,7 +84,18 @@ namespace FirstApiMVC.Controllers
             }
         }
 
-
+        [HttpGet("/Purchase")]
+        public async Task<IActionResult> PurchaseProduct(PurchaseDto _purchase)
+        {
+            try
+            {
+                var result = await _shopRepo.PurchaseProduct(_purchase);
+                return StatusCode(StatusCodes.Status201Created, result);
+            }catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,ex.Message);
+            }
+        }
 
 
     }

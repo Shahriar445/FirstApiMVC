@@ -15,7 +15,8 @@ public partial class Purchase
 
     public int? SupplierId { get; set; }
 
-    public DateOnly? PurchaseDate { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? PurchaseDate { get; set; }
 
     public bool? IsActive { get; set; }
 }

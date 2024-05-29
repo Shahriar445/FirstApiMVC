@@ -13,7 +13,8 @@ public partial class Sale
 
     public int? CustomerId { get; set; }
 
-    public DateOnly? SalesDate { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? SalesDate { get; set; }
 
     public bool? IsActive { get; set; }
 }

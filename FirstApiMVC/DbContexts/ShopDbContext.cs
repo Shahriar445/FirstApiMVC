@@ -46,26 +46,6 @@ public partial class ShopDbContext : DbContext
             entity.Property(e => e.PartnerTypeName).IsFixedLength();
         });
 
-        modelBuilder.Entity<Purchase>(entity =>
-        {
-            entity.Property(e => e.PurchaseId).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<PurchaseDetail>(entity =>
-        {
-            entity.Property(e => e.DetailsId).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<Sale>(entity =>
-        {
-            entity.Property(e => e.SalesId).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<SalesDetail>(entity =>
-        {
-            entity.Property(e => e.DetailsId).ValueGeneratedNever();
-        });
-
         OnModelCreatingPartial(modelBuilder);
     }
 

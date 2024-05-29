@@ -132,32 +132,33 @@ namespace FirstApiMVC.Repository
                 {
                     throw new ArgumentException("Partner Type can't empty!");
                 }
-                // catch PartnerType Id based on given Partner  name
+
                 var partnerType = await _context.PartnerTypes.FirstOrDefaultAsync(p => p.PartnerTypeName.ToLower() == _partnerdto.PartnerTypeName.ToLower());
                 if (partnerType == null)
                 {
-                    //  PartnerType if not there in db
+
                     partnerType = new PartnerType
                     {
                         PartnerTypeName = _partnerdto.PartnerTypeName,
                         IsActive = _partnerdto.IsActive,
-                        
+
                     };
                     await _context.PartnerTypes.AddAsync(partnerType);
                     await _context.SaveChangesAsync();
                 }
-                //  Partner 
+
                 var partner = new Partner
                 {
                     PartnerName = _partnerdto.PartnerName,
                     PartnerTypeId = partnerType.PartnerTypeId,
                     IsActive = _partnerdto.IsActive,
                 };
-               
 
-                 
+
+
                 await _context.Partners.AddAsync(partner);
                 await _context.SaveChangesAsync();
+
                 return $"Partner Name '{_partnerdto.PartnerName}'& Partner Type '{_partnerdto.PartnerTypeName}' created successfully.";
             }
             catch (Exception ex)
@@ -165,6 +166,37 @@ namespace FirstApiMVC.Repository
                 return ex.Message;
             }
         }
+
+        public async Task<string> PurchaseProduct(PurchaseDto _purchasedto)
+        {
+
+            try
+            {
+                var purchase = new Purchase
+                {
+                    SupplierId=_purchasedto.SupplierId,
+                    PurchaseDate=_purchasedto.PurchaseDate,
+                    //IsActive=_purchasedto.IsActive,
+                };
+                await _context.Purchases.AddAsync(purchase);
+                await _context.SaveChangesAsync();
+
+                foreach(var _pr in _purchasedto.PurchaseDetails)
+                {
+
+                }
+
+
+
+            }catch(Exception e)
+            {
+                return e.Message;
+            }
+
+        }
+
+
+
     }
 }
 
