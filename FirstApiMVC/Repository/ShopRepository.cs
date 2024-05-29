@@ -78,58 +78,6 @@ namespace FirstApiMVC.Repository
 
             return message;
         }
-        // --------------------------------- Create Partner ---------------------------------------
-        public async Task<string> CreatePartnerType(PartnerTypeDto _partnerType)
-        {
-
-            string message = "";
-            try
-            {
-
-                var data = await _context.PartnerTypes.Where(e => e.PartnerTypeId == _partnerType.PartnerTypeId).FirstOrDefaultAsync();
-                if (data != null)
-                {
-                    var e = await _context.PartnerTypes.Where(e => e.PartnerTypeName.ToLower().Trim() == _partnerType.PartnerTypeName.ToLower().Trim()).FirstOrDefaultAsync();
-                    if (e != null)
-                    {
-                        throw new Exception("Partner Name  already Created");
-                    }
-                   
-                    data.PartnerTypeName = _partnerType.PartnerTypeName;
-                    
-                    data.IsActive = _partnerType.IsActive;
-
-                    _context.PartnerTypes.Update(data);
-                    message = "Updated";
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    var e = await _context.PartnerTypes.Where(e => e.PartnerTypeName.ToLower().Trim() == _partnerType.PartnerTypeName.ToLower().Trim()).FirstOrDefaultAsync();
-                    if (e != null)
-                    {
-                        throw new Exception("Item already Created");
-                    }
-                    PartnerType p = new PartnerType();
-                    
-                    p.PartnerTypeName = _partnerType.PartnerTypeName;
-            
-                    p.IsActive = _partnerType.IsActive;
-
-                    await _context.PartnerTypes.AddAsync(p);
-                    message = "Successful Partner type Create";
-                    await _context.SaveChangesAsync();
-                }
-           
-
-            }
-            catch (Exception ex)
-            {
-                message = ex.Message;
-
-            }
-            return message;
-        }
         // ---------------------------------Update list---------------------------------------
         public async Task<string> UpdateItems(List<ItemDto> items)
         {
@@ -171,60 +119,7 @@ namespace FirstApiMVC.Repository
 
 
 
-        //public async Task<IActionResult> CreatePartner(PartnerDto partnerDto)
-        //{
-        //    string message = "";
-        //    try
-        //    {
-
-        //        var P_Type = await _context.PartnerTypes.Where(e => e.PartnerTypeId == partnerDto.PartnerTypeId).FirstOrDefaultAsync();
-        //        var P_id = await _context.Partners.Where(e => e.PartnerId == partnerDto.PartnerId).FirstOrDefaultAsync();
-
-        //        if (P_Type != null)
-        //        {
-        //            var e = await _context.PartnerTypes.Where(e => e.PartnerTypeName.ToLower().Trim() == _partnerType.PartnerTypeName.ToLower().Trim()).FirstOrDefaultAsync();
-        //            if (e != null)
-        //            {
-        //                throw new Exception("Partner Type  already Created");
-        //            }
-
-        //            P_Type.PartnerTypeName = partnerDto.PartnerTypeName;
-
-        //            P_Type.IsActive = partnerDto.IsActive;
-
-        //            _context.PartnerTypes.Update(P_Type);
-        //            message = "Updated PartnerType";
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        else
-        //        {
-        //            var e = await _context.PartnerTypes.Where(e => e.PartnerTypeName.ToLower().Trim() == partnerDto.PartnerTypeName.ToLower().Trim()).FirstOrDefaultAsync();
-        //            if (e != null)
-        //            {
-        //                throw new Exception("Item already Created");
-        //            }
-        //            PartnerType p = new PartnerType();
-
-        //            p.PartnerTypeName = partnerDto.PartnerTypeName;
-
-        //            p.IsActive = partnerDto.IsActive;
-
-        //            await _context.PartnerTypes.AddAsync(p);
-        //            message = "Successful Partner  type Create";
-        //            await _context.SaveChangesAsync();
-        //        }
-
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        message = ex.Message;
-
-        //    }
-        //    return message;
-
-        //}
-
+        // ---------------------------------Partner Details ---------------------------------------
 
         public async Task<string> CreatePartner(string partnerName, string partnerTypeName, bool? isActive)
         {

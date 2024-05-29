@@ -67,7 +67,8 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
-        // ---------------------------------Customer --------------------------------------------------- 
+        
+        // ---------------------------------Partner Detials  --------------------------------------------------- 
        
         [HttpPost("/CreatePartner")]
         public async Task<IActionResult> CreatePartner(PartnerDto partnerDto)
