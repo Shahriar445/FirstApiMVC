@@ -38,7 +38,7 @@ namespace FirstApiMVC.Controllers
         }
         
         // ---------------------------------PartnerType---------------------------------------
-        [HttpPost("/CreatePartnerType")]
+       /* [HttpPost("/CreatePartnerType")]
         public async Task<IActionResult> CreatePartnerType(PartnerTypeDto partnertype)
         {
             try
@@ -51,7 +51,7 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
 
-        }
+        }*/
 
         // ---------------------------------Update items--------------------------------------------------- 
         [HttpPut("/UpdateItems")]
@@ -67,6 +67,22 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
+        // ---------------------------------Customer --------------------------------------------------- 
+       
+        [HttpPost("/CreatePartner")]
+        public async Task<IActionResult> CreatePartner(PartnerDto partnerDto)
+        {
+            try
+            {
+                var result = await _shopRepo.CreatePartner(partnerDto.PartnerName, partnerDto.PartnerTypeName, partnerDto.IsActive);
+                return StatusCode(StatusCodes.Status201Created, result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
 
 
 

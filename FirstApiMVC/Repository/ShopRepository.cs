@@ -2,6 +2,7 @@
 using FirstApiMVC.DBContexts.Models;
 using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Formats.Asn1;
 
@@ -167,8 +168,105 @@ namespace FirstApiMVC.Repository
 
             return message;
         }
+
+
+
+        //public async Task<IActionResult> CreatePartner(PartnerDto partnerDto)
+        //{
+        //    string message = "";
+        //    try
+        //    {
+
+        //        var P_Type = await _context.PartnerTypes.Where(e => e.PartnerTypeId == partnerDto.PartnerTypeId).FirstOrDefaultAsync();
+        //        var P_id = await _context.Partners.Where(e => e.PartnerId == partnerDto.PartnerId).FirstOrDefaultAsync();
+
+        //        if (P_Type != null)
+        //        {
+        //            var e = await _context.PartnerTypes.Where(e => e.PartnerTypeName.ToLower().Trim() == _partnerType.PartnerTypeName.ToLower().Trim()).FirstOrDefaultAsync();
+        //            if (e != null)
+        //            {
+        //                throw new Exception("Partner Type  already Created");
+        //            }
+
+        //            P_Type.PartnerTypeName = partnerDto.PartnerTypeName;
+
+        //            P_Type.IsActive = partnerDto.IsActive;
+
+        //            _context.PartnerTypes.Update(P_Type);
+        //            message = "Updated PartnerType";
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        else
+        //        {
+        //            var e = await _context.PartnerTypes.Where(e => e.PartnerTypeName.ToLower().Trim() == partnerDto.PartnerTypeName.ToLower().Trim()).FirstOrDefaultAsync();
+        //            if (e != null)
+        //            {
+        //                throw new Exception("Item already Created");
+        //            }
+        //            PartnerType p = new PartnerType();
+
+        //            p.PartnerTypeName = partnerDto.PartnerTypeName;
+
+        //            p.IsActive = partnerDto.IsActive;
+
+        //            await _context.PartnerTypes.AddAsync(p);
+        //            message = "Successful Partner  type Create";
+        //            await _context.SaveChangesAsync();
+        //        }
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        message = ex.Message;
+
+        //    }
+        //    return message;
+
+        //}
+
+
+        public async Task<string> CreatePartner(string partnerName, string partnerTypeName, bool? isActive)
+        {
+            try
+            {
+                // Fetch Partner Type Id based on the provided Partner Type name
+                var partnerType = await _context.PartnerTypes.FirstOrDefaultAsync(p => p.PartnerTypeName.ToLower() == partnerTypeName.ToLower());
+                if (partnerType == null)
+                {
+                    // Create new Partner Type if it doesn't exist
+                    partnerType = new PartnerType
+                    {
+                        PartnerTypeName = partnerTypeName,
+                        IsActive = isActive,
+                        
+                    };
+                    await _context.PartnerTypes.AddAsync(partnerType);
+                    await _context.SaveChangesAsync();
+                }
+                // Create new Partner entity
+                var partner = new Partner
+                {
+                    PartnerName = partnerName,
+                    PartnerTypeId = partnerType.PartnerTypeId,
+                    IsActive = isActive
+                };
+               
+
+                // Add the new Partner to the database
+                await _context.Partners.AddAsync(partner);
+                await _context.SaveChangesAsync();
+
+                return "Partner created successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }
+
 
    
 

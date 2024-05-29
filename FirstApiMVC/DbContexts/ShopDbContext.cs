@@ -38,7 +38,6 @@ public partial class ShopDbContext : DbContext
     {
         modelBuilder.Entity<Partner>(entity =>
         {
-            entity.Property(e => e.PartnerId).ValueGeneratedNever();
             entity.Property(e => e.PartnerName).IsFixedLength();
         });
 
