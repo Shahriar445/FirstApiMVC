@@ -12,5 +12,6 @@ namespace FirstApiMVC.IRepository
         Task<string> CreatePartner(PartnerDto _partnerdto);
         Task<string> PurchaseProduct(PurchaseDto _purchasedto);
         Task<string> SalesProduct(SaleDto _saledto);
+        Task<string>GetDailyPurchaseVsSalesReport(DailyReportDto _dailypurchasedto);
     }
 }

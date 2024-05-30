@@ -312,6 +312,11 @@ namespace FirstApiMVC.Repository
                 return e. Message;
             }
         }
+
+        public async Task<string> GetDailyPurchaseVsSalesReport(DailyReportDto _dailypurchasedto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
