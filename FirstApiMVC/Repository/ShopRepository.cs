@@ -172,23 +172,69 @@ namespace FirstApiMVC.Repository
 
             try
             {
+                
+                
+                var supplier = await _context.Partners.FindAsync(_purchasedto.SupplierId);
+                if (supplier == null ) 
+                {
+                    return $"Supplier with ID {_purchasedto.SupplierId} not found. or invalid supplier type.";
+                }
+
+                // for purchase create 
+
                 var purchase = new Purchase
                 {
                     SupplierId=_purchasedto.SupplierId,
                     PurchaseDate=_purchasedto.PurchaseDate,
-                    //IsActive=_purchasedto.IsActive,
+                    IsActive=_purchasedto.IsActive,
                 };
                 await _context.Purchases.AddAsync(purchase);
                 await _context.SaveChangesAsync();
 
-                foreach(var _pr in _purchasedto.PurchaseDetails)
+
+                // Purchase Details 
+                foreach(var _detail in _purchasedto.PurchaseDetails)
                 {
 
+                    // for item 
+                    var item = await _context.Items.FindAsync(_detail.ItemId);
+                        if (item != null)
+                        {
+                            item.NumStockQuantity+=_detail.ItemQuantity;
+                            _context.Items.Update(item);
+                        }
+                        if (item == null)
+                        {
+                            return $"Item with ID {_detail.ItemId} not found.";
+                        }
+                        if (_detail.ItemQuantity <= 0)
+                        {
+                            return "Item quantity must be greater than zero.";
+                        }
+
+                        if ( _detail.UnitPrice <= 0)
+                        {
+                            return "Unit price must be greater than zero.";
+                        }
+
+                    var purchaseDetail = new PurchaseDetail
+                        {
+                            PurchaseId =purchase.PurchaseId,
+                            ItemId=_detail.ItemId,
+                            UnitPrice=_detail.UnitPrice,
+                            IsActive=true,
+                            ItemQuantity=_detail.ItemQuantity
+                        };
+
+                        await _context.PurchaseDetails.AddAsync(purchaseDetail);
                 }
 
+                await _context.SaveChangesAsync();
+                return "Purchase Create Success";
 
 
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 return e.Message;
             }

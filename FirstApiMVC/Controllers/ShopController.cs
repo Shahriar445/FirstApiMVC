@@ -84,7 +84,7 @@ namespace FirstApiMVC.Controllers
             }
         }
 
-        [HttpGet("/Purchase")]
+        [HttpPost("/Purchase")]
         public async Task<IActionResult> PurchaseProduct(PurchaseDto _purchase)
         {
             try
