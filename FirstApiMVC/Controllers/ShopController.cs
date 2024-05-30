@@ -97,6 +97,20 @@ namespace FirstApiMVC.Controllers
             }
         }
 
+        [HttpPost("/Sales")]
+        public async Task<IActionResult> SalesProduct(SaleDto _sale)
+        {
+            try
+            {
+                var result = await _shopRepo.SalesProduct(_sale);
+                return StatusCode(StatusCodes.Status201Created,result);
+
+            }
+            catch(Exception ex) 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
     }
 

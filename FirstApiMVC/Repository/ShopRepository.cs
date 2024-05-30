@@ -2,6 +2,7 @@
 using FirstApiMVC.DBContexts.Models;
 using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Formats.Asn1;
@@ -222,7 +223,7 @@ namespace FirstApiMVC.Repository
                             PurchaseId =purchase.PurchaseId,
                             ItemId=_detail.ItemId,
                             UnitPrice=_detail.UnitPrice,
-                            IsActive=true,
+                            IsActive=_purchasedto.IsActive,
                             ItemQuantity=_detail.ItemQuantity
                         };
 
@@ -241,8 +242,76 @@ namespace FirstApiMVC.Repository
 
         }
 
+        public async Task<string> SalesProduct(SaleDto _saledto)
+        {
+
+            try
+            {
+
+                var customer = await _context.Partners.FindAsync(_saledto.CustomerId);
+                if (customer == null || customer.PartnerTypeId != 1) // Assuming 1 is the PartnerTypeId for customers
+                {
+                    return "Customer not found or invalid customer type.";
+                }
+
+                // Sales 
+
+                var salerecord = new Sale
+                {
+                    CustomerId=_saledto.CustomerId,
+                    SalesDate=_saledto.SalesDate,
+                    IsActive=_saledto.IsActive
 
 
+                };
+               await _context.Sales.AddAsync(salerecord);
+                await _context.SaveChangesAsync();
+
+
+                // Purchase Details 
+                foreach (var _detail in _saledto.SaleDeatils)
+                {
+                    if (_detail.ItemId==0)
+                    {
+                        return "Item id not zerro";
+                    }
+
+                    var item = await _context.Items.FindAsync(_detail.ItemId);
+                    if (item == null)
+                    {
+                        return $"Item with {_detail.ItemId} not found ";
+                    }
+
+                    if (item.NumStockQuantity<_detail.ItemQuantity)
+                    {
+                        return $"Insufficient stock for item: {item.ItemName}. Available stock: {item.NumStockQuantity}.";
+                    }
+
+                    item.NumStockQuantity-= _detail.ItemQuantity;
+                    _context.Items.Update(item);
+
+                    var salesDetails = new SalesDetail
+                    {
+                        SalesId=salerecord.SalesId,
+                        ItemId = item.ItemId,
+                        ItemQuantity=_detail.ItemQuantity,
+                        UnitPrice=_detail.UnitPrice,
+                        IsActive=salerecord.IsActive
+
+                    };
+                    await _context.SalesDetails.AddAsync(salesDetails);
+                  
+                }
+                await _context.SaveChangesAsync();
+
+
+                return "Sales Complete Success ";
+            }
+            catch (Exception e)
+            {
+                return e. Message;
+            }
+        }
     }
 }
 
