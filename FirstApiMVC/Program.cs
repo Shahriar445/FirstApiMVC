@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-
+//Dependancy inversition 
 // Register your DbContext
 builder.Services.AddDbContext<ShopDbContext>();
 

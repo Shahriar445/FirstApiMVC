@@ -1,0 +1,172 @@
+﻿
+
+
+-- Task 7 item wise daily purchase report --------------------
+
+DECLARE @StartDate DATE = '2024-05-30';
+DECLARE @EndDate DATE = '2024-05-31'; 
+SELECT
+FORMAT(Purchase.PurchaseDate, 'yyyy-MM-dd') AS DailyPurchase,
+    
+    Item.ItemId,
+    Item.ItemName,
+    SUM(PurchaseDetails.ItemQuantity) AS Total_Quantity,
+    SUM(PurchaseDetails.ItemQuantity * PurchaseDetails.UnitPrice) AS TOTAL_Amount
+FROM Purchase
+INNER JOIN PurchaseDetails ON Purchase.PurchaseID = PurchaseDetails.PurchaseId
+INNER JOIN Item ON PurchaseDetails.ItemId = Item.ItemId
+WHERE Item.IsActive = 1 AND PurchaseDetails.IsActive = 1 AND Purchase.IsActive = 1 
+
+AND
+Purchase.PurchaseDate BETWEEN @StartDate AND @EndDate
+GROUP BY
+  FORMAT(Purchase.PurchaseDate, 'yyyy-MM-dd'),
+    Item.ItemId,
+    Item.ItemName
+ORDER BY
+   DailyPurchase,
+    Item.ItemName;
+
+
+--------------------------------------------------Task 8 --- item wise month sale report 
+
+DECLARE @StartDate DATE = '2024-05-30'; 
+DECLARE @EndDate DATE = '2024-05-31'; 
+
+
+SELECT
+    FORMAT(Sales.SalesDate, 'yyyy-MM-dd') AS SalesMonth,
+    Item.ItemId,
+    Item.ItemName,
+    SUM(SalesDetails.ItemQuantity) AS Total_Quantity,
+    SUM(SalesDetails.ItemQuantity * SalesDetails.UnitPrice) AS TOTAL_Amount
+FROM Sales
+INNER JOIN SalesDetails ON Sales.SalesId = SalesDetails.SalesId
+INNER JOIN Item ON SalesDetails.ItemId = Item.ItemId
+WHERE Item.IsActive = 1
+  AND SalesDetails.IsActive = 1
+  AND Sales.IsActive = 1
+  AND Sales.SalesDate BETWEEN @StartDate AND @EndDate
+GROUP BY
+    FORMAT(Sales.SalesDate, 'yyyy-MM-dd'),
+    Item.ItemId,
+    Item.ItemName
+ORDER BY
+    SalesMonth,
+    Item.ItemName;
+
+
+
+
+-----------------------------------------Task 9 item wise purchase vs sales report -----------------------
+
+DECLARE @StartDate DATE = '2024-06-01'; 
+DECLARE @EndDate DATE = '2024-06-02'; 
+
+SELECT P.PurchaseDate AS Date,
+
+I.ItemId,
+I.ItemName,
+SUM(Pd.ItemQuantity)AS Total_Purchase_Quantity,
+
+SUM(Pd.ItemQuantity*Pd.UnitPrice) As Total_Purchase_Amount ,
+0 AS Total_Sales_Quantity,
+0 AS Total_Sales_Amount
+FROM Purchase P
+INNER JOIN PurchaseDetails Pd ON P.PurchaseID=Pd.PurchaseId
+INNER Join Item I on i.ItemId=i.ItemId
+
+Where I.IsActive=1 and Pd.IsActive=1 and P.IsActive=1 and P.PurchaseDate Between @StartDate and @EndDate
+
+
+
+Group By 
+P.PurchaseDate, I.ItemId,I.ItemName
+
+union all
+
+select 
+S.SalesDate,
+I.ItemId,I.ItemName,
+0 as Total_Purchase_Quantity,
+0 AS Total_Purchase_Amount,
+SUM(S_D.ItemQuantity) AS Total_Sales_Quantity,
+SUM(S_D.ItemQuantity * S_D.UnitPrice) AS Total_Sales_Amount 
+
+from Sales S
+
+INNER JOIN SalesDetails S_D ON S.SalesId =
+S.SalesId
+Inner Join Item I On S_D.ItemId=I.ItemId
+
+Where I.IsActive=1 and S_D.IsActive=1 and S.IsActive=1 and S.IsActive=1 and S.SalesDate Between @StartDate and @EndDate
+
+Group By
+S.SalesDate,I.ItemId,I.ItemName
+
+ORder by 
+Date, ItemName
+
+---------------------------------------------10 ---------------------
+DECLARE @StartDate DATE = '2024-06-01'; 
+DECLARE @EndDate DATE = '2024-06-02'; 
+
+-- Find report with given column
+SELECT 
+    MonthName,
+    Year,
+    ItemId,
+    ItemName,
+    SUM(Total_Purchase_Amount) AS Total_Purchase_Amount,
+    SUM(Total_Sales_Amount) AS Total_Sales_Amount,
+	sum(Total_Purchase_Amount-Total_Sales_Amount) as Profite 
+FROM (
+    SELECT 
+        DATENAME(month, P.PurchaseDate) AS MonthName,
+        YEAR(P.PurchaseDate) AS Year,
+        I.ItemId,
+        I.ItemName,
+        SUM(Pd.ItemQuantity * Pd.UnitPrice) AS Total_Purchase_Amount,
+        0 AS Total_Sales_Amount
+    FROM 
+        Purchase P
+    INNER JOIN 
+        PurchaseDetails Pd ON P.PurchaseID = Pd.PurchaseId
+    INNER JOIN 
+        Item I ON Pd.ItemId = I.ItemId
+    WHERE 
+        I.IsActive = 1 AND Pd.IsActive = 1 AND P.IsActive = 1 
+        AND P.PurchaseDate BETWEEN @StartDate AND @EndDate
+    GROUP BY 
+        DATENAME(month, P.PurchaseDate), YEAR(P.PurchaseDate), I.ItemId, I.ItemName
+    
+    UNION ALL
+
+    SELECT 
+        DATENAME(month, S.SalesDate) AS MonthName,
+        YEAR(S.SalesDate) AS Year,
+        I.ItemId,
+        I.ItemName,
+        0 AS Total_Purchase_Amount,
+        SUM(S_D.ItemQuantity * S_D.UnitPrice) AS Total_Sales_Amount
+    FROM 
+        Sales S
+    INNER JOIN 
+        SalesDetails S_D ON S.SalesId = S_D.SalesId
+    INNER JOIN 
+        Item I ON S_D.ItemId = I.ItemId
+    WHERE 
+        I.IsActive = 1 AND S_D.IsActive = 1 AND S.IsActive = 1 
+        AND S.SalesDate BETWEEN @StartDate AND @EndDate
+    GROUP BY 
+        DATENAME(month, S.SalesDate), YEAR(S.SalesDate), I.ItemId, I.ItemName
+) AS Reports
+GROUP BY 
+    MonthName, Year, ItemId, ItemName
+ORDER BY 
+    Year, MonthName, ItemName;
+
+
+
+
+
