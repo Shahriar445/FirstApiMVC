@@ -173,10 +173,10 @@ namespace FirstApiMVC.Repository
 
             try
             {
-                
-                
+
+
                 var supplier = await _context.Partners.FindAsync(_purchasedto.SupplierId);
-                if (supplier == null ) 
+                if (supplier == null)
                 {
                     return $"Supplier with ID {_purchasedto.SupplierId} not found. or invalid supplier type.";
                 }
@@ -194,40 +194,40 @@ namespace FirstApiMVC.Repository
 
 
                 // Purchase Details 
-                foreach(var _detail in _purchasedto.PurchaseDetails)
+                foreach (var _detail in _purchasedto.PurchaseDetails)
                 {
 
                     // for item 
                     var item = await _context.Items.FindAsync(_detail.ItemId);
-                        if (item != null)
-                        {
-                            item.NumStockQuantity+=_detail.ItemQuantity;
-                            _context.Items.Update(item);
-                        }
-                        if (item == null)
-                        {
-                            return $"Item with ID {_detail.ItemId} not found.";
-                        }
-                        if (_detail.ItemQuantity <= 0)
-                        {
-                            return "Item quantity must be greater than zero.";
-                        }
+                    if (item != null)
+                    {
+                        item.NumStockQuantity+=_detail.ItemQuantity;
+                        _context.Items.Update(item);
+                    }
+                    if (item == null)
+                    {
+                        return $"Item with ID {_detail.ItemId} not found.";
+                    }
+                    if (_detail.ItemQuantity <= 0)
+                    {
+                        return "Item quantity must be greater than zero.";
+                    }
 
-                        if ( _detail.UnitPrice <= 0)
-                        {
-                            return "Unit price must be greater than zero.";
-                        }
+                    if (_detail.UnitPrice <= 0)
+                    {
+                        return "Unit price must be greater than zero.";
+                    }
 
                     var purchaseDetail = new PurchaseDetail
-                        {
-                            PurchaseId =purchase.PurchaseId,
-                            ItemId=_detail.ItemId,
-                            UnitPrice=_detail.UnitPrice,
-                            IsActive=_purchasedto.IsActive,
-                            ItemQuantity=_detail.ItemQuantity
-                        };
+                    {
+                        PurchaseId =purchase.PurchaseId,
+                        ItemId=_detail.ItemId,
+                        UnitPrice=_detail.UnitPrice,
+                        IsActive=_purchasedto.IsActive,
+                        ItemQuantity=_detail.ItemQuantity
+                    };
 
-                        await _context.PurchaseDetails.AddAsync(purchaseDetail);
+                    await _context.PurchaseDetails.AddAsync(purchaseDetail);
                 }
 
                 await _context.SaveChangesAsync();
@@ -235,7 +235,7 @@ namespace FirstApiMVC.Repository
 
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return e.Message;
             }
@@ -264,7 +264,7 @@ namespace FirstApiMVC.Repository
 
 
                 };
-               await _context.Sales.AddAsync(salerecord);
+                await _context.Sales.AddAsync(salerecord);
                 await _context.SaveChangesAsync();
 
 
@@ -300,7 +300,7 @@ namespace FirstApiMVC.Repository
 
                     };
                     await _context.SalesDetails.AddAsync(salesDetails);
-                  
+
                 }
                 await _context.SaveChangesAsync();
 
@@ -309,7 +309,7 @@ namespace FirstApiMVC.Repository
             }
             catch (Exception e)
             {
-                return e. Message;
+                return e.Message;
             }
         }
 
@@ -317,10 +317,40 @@ namespace FirstApiMVC.Repository
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<DailyPurchaseReportDto>> GetDailyPurchaseReport(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var report = await (from p in _context.Purchases
+                                    join pd in _context.PurchaseDetails on p.PurchaseId equals pd.PurchaseId
+                                    join i in _context.Items on pd.ItemId equals i.ItemId
+                                    where  p.PurchaseDate >= startDate && p.PurchaseDate <= endDate && p.IsActive == true && pd.IsActive == true && i.IsActive == true
+                                    group new { p, pd, i } by new { Date = p.PurchaseDate, i.ItemId, i.ItemName } into g
+                                    select new DailyPurchaseReportDto
+                                    {
+                                        DailyPurchase = g.Key.Date.ToString(),
+                                        ItemId = g.Key.ItemId,
+                                        ItemName = g.Key.ItemName,
+                                        TotalQuantity = (int)g.Sum(x => x.pd.ItemQuantity),
+                                        TotalAmount = (decimal)g.Sum(x => x.pd.ItemQuantity * x.pd.UnitPrice)
+                                    })
+                         .OrderBy(r => r.DailyPurchase)
+                         .ThenBy(r => r.ItemName)
+                         .ToListAsync();
+
+                return report;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting daily purchase report: {ex.Message}");
+            }
+          
+        }
     }
 }
 
 
-   
+
 
 

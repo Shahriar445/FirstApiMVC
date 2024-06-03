@@ -3,6 +3,7 @@ using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Formats.Asn1;
 
 
 namespace FirstApiMVC.Controllers
@@ -110,6 +111,21 @@ namespace FirstApiMVC.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+        }
+        [HttpGet("/Daily Purchase")]
+        
+        public async Task <IActionResult> GetDailyPurchaseReport(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var result = await _shopRepo.GetDailyPurchaseReport(startDate,  endDate);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
         }
 
     }
