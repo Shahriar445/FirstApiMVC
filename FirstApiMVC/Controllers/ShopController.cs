@@ -25,10 +25,11 @@ namespace FirstApiMVC.Controllers
 
         //----------------------------------------------Create Items --------------------------------------
         [HttpPost("/CreateItems")]
-        public async Task<IActionResult> CreateItems(ItemListDto itemListDto)
+        public async Task<IActionResult> CreateItems([FromForm] ItemListDto itemListDto)
         {
             try
             {
+
                 var result = await _shopRepo.CreateItems(itemListDto);
                 return StatusCode(StatusCodes.Status201Created, result);
             }

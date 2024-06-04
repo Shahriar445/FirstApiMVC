@@ -57,9 +57,17 @@ DependencyInversion.RegisterServices(builder.Services);
 
 
 
+// service for fronted 
 
-
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://127.0.0.1:5500")
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 
 
@@ -79,7 +87,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
