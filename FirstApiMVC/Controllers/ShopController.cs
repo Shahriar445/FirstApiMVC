@@ -112,7 +112,7 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpGet("/Daily Purchase")]
+        [HttpGet("/DailyPurchase")]
         
         public async Task <IActionResult> GetDailyPurchaseReport(DateTime startDate, DateTime endDate)
         {
