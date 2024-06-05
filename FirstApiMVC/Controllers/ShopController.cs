@@ -10,7 +10,7 @@ namespace FirstApiMVC.Controllers
 {
 
 
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ShopController : ControllerBase
     {
@@ -24,8 +24,28 @@ namespace FirstApiMVC.Controllers
         }
 
         //----------------------------------------------Create Items --------------------------------------
+        [HttpPost("/CreateItem")]
+        public async Task<IActionResult> CreateItem(ItemDto itemdto)
+        {
+            try
+            {
+
+                var result = await _shopRepo.CreateItem(itemdto);
+                return StatusCode(StatusCodes.Status201Created, result);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+
+
+
+
+
+
         [HttpPost("/CreateItems")]
-        public async Task<IActionResult> CreateItems([FromForm] ItemListDto itemListDto)
+        public async Task<IActionResult> CreateItems( ItemListDto itemListDto)
         {
             try
             {

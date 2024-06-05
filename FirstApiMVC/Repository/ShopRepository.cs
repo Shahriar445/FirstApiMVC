@@ -16,7 +16,61 @@ namespace FirstApiMVC.Repository
         {
             _context = context;
         }
-        // ---------------------------------Multiple  item List ---------------------------------------
+
+        // single items 
+        public async Task<string> CreateItem(ItemDto item)
+        {
+            string message = "";
+            try
+            {
+                var data = await _context.Items.FirstOrDefaultAsync(e => e.ItemId == item.ItemId);
+                if (data != null)
+                {
+                    var duplicate = await _context.Items
+                        .FirstOrDefaultAsync(e => e.ItemName.ToLower().Trim() == item.ItemName.ToLower().Trim() && e.ItemId != item.ItemId);
+                    if (duplicate != null)
+                    {
+                        throw new Exception($"Item with name '{item.ItemName}' already exists.");
+                    }
+
+                    data.ItemName = item.ItemName;
+                    data.NumStockQuantity = item.NumStockQuantity;
+                    data.IsActive = item.IsActive;
+
+                    _context.Items.Update(data);
+                    message = $"Item '{item.ItemName}' updated successfully.";
+                }
+                else
+                {
+                    var duplicate = await _context.Items
+                        .FirstOrDefaultAsync(e => e.ItemName.ToLower().Trim() == item.ItemName.ToLower().Trim());
+                    if (duplicate != null)
+                    {
+                        throw new Exception($"Item with name '{item.ItemName}' already exists.");
+                    }
+
+                    var newItem = new Item
+                    {
+                        ItemName = item.ItemName,
+                        NumStockQuantity = item.NumStockQuantity,
+                        IsActive = item.IsActive
+                    };
+
+                    await _context.Items.AddAsync(newItem);
+                    message = $"Item '{item.ItemName}' created successfully.";
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+            }
+
+            return message;
+        }
+
+        // ---------------------------------Multiple  item  ---------------------------------------
         public async Task<string> CreateItems(ItemListDto itemListDto)
         {
 
@@ -28,7 +82,6 @@ namespace FirstApiMVC.Repository
             }
             return string.Join("; ", messages);
         }
-        // --------------------------------- Create item ---------------------------------------
         private async Task<string> CreateOrUpdateItem(ItemDto item)
         {
             string message = "";
@@ -80,7 +133,12 @@ namespace FirstApiMVC.Repository
 
             return message;
         }
+
+       
+
+        
         // ---------------------------------Update list---------------------------------------
+
         public async Task<string> UpdateItems(List<ItemDto> items)
         {
             string message = "Items updated successfully";
