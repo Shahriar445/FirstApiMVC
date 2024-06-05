@@ -15,6 +15,7 @@ namespace FirstApiMVC.IRepository
         Task<string> SalesProduct(SaleDto _saledto);
         Task<string>GetDailyPurchaseVsSalesReport(DailyReportDto _dailypurchasedto);
         Task<List<DailyPurchaseReportDto>> GetDailyPurchaseReport(DateTime startDate, DateTime endDate);
+         Task<List<ItemDto>> GetAllItems();
     }
 }
 

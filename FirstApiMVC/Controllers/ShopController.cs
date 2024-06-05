@@ -25,7 +25,7 @@ namespace FirstApiMVC.Controllers
 
         //----------------------------------------------Create Items --------------------------------------
         [HttpPost("/CreateItem")]
-        public async Task<IActionResult> CreateItem(ItemDto itemdto)
+        public async Task<IActionResult> CreateItem([FromBody] ItemDto itemdto)
         {
             try
             {
@@ -40,16 +40,12 @@ namespace FirstApiMVC.Controllers
         }
 
 
-
-
-
-
         [HttpPost("/CreateItems")]
-        public async Task<IActionResult> CreateItems( ItemListDto itemListDto)
+        public async Task<IActionResult> CreateItems(List<ItemDto> itemDtos)
         {
             try
             {
-
+                var itemListDto = new ItemListDto { Items = itemDtos };
                 var result = await _shopRepo.CreateItems(itemListDto);
                 return StatusCode(StatusCodes.Status201Created, result);
             }
@@ -58,26 +54,43 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
-        
+
         // ---------------------------------PartnerType---------------------------------------
-       /* [HttpPost("/CreatePartnerType")]
-        public async Task<IActionResult> CreatePartnerType(PartnerTypeDto partnertype)
+        /* [HttpPost("/CreatePartnerType")]  not implement now 
+         public async Task<IActionResult> CreatePartnerType(PartnerTypeDto partnertype)
+         {
+             try
+             {
+                 var createPartner = await _shopRepo.CreatePartnerType(partnertype);
+                 return StatusCode(StatusCodes.Status201Created, createPartner);
+             }
+             catch (Exception e)
+             {
+                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+             }
+
+         }*/
+
+       
+
+
+        [HttpGet("/GetAllItems")]
+        public async Task<IActionResult> GetAllItems(  )
         {
             try
             {
-                var createPartner = await _shopRepo.CreatePartnerType(partnertype);
-                return StatusCode(StatusCodes.Status201Created, createPartner);
+                var items = await _shopRepo.GetAllItems();
+                return Ok(items);
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
-
-        }*/
+        }
 
         // ---------------------------------Update items--------------------------------------------------- 
         [HttpPut("/UpdateItems")]
-        public async Task<IActionResult> UpdateItems([FromBody] List<ItemDto> items)
+        public async Task<IActionResult> UpdateItems( List<ItemDto> items)
         {
             try
             {

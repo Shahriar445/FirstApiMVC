@@ -406,6 +406,21 @@ namespace FirstApiMVC.Repository
             }
           
         }
+
+        public async Task<List<ItemDto>> GetAllItems()
+        {
+            return await _context.Items
+                                 .Select(item => new ItemDto
+                                 {
+                                     ItemId = item.ItemId,
+                                     ItemName = item.ItemName,
+                                     NumStockQuantity = item.NumStockQuantity,
+                                     IsActive = item.IsActive
+                                 })
+                                 .ToListAsync();
+        }
+
+
     }
 }
 
