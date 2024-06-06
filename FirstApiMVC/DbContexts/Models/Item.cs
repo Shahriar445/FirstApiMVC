@@ -19,4 +19,8 @@ public partial class Item
     public int? NumStockQuantity { get; set; }
 
     public bool? IsActive { get; set; }
+
+    [Column("imageURL")]
+    [StringLength(500)]
+    public string? ImageUrl { get; set; }
 }

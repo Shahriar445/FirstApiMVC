@@ -70,9 +70,6 @@ builder.Services.AddCors(options =>
 });
 
 
-
-
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -89,7 +86,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors();
 app.UseHttpsRedirection();
-
+app.UseStaticFiles(); // for image file 
 app.UseAuthorization();
 
 app.MapControllers();

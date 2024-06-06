@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <Folder Include="DbContexts\Models\" />
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

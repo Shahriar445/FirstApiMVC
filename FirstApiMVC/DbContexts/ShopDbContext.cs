@@ -36,6 +36,11 @@ public partial class ShopDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Item>(entity =>
+        {
+            entity.Property(e => e.ImageUrl).IsFixedLength();
+        });
+
         modelBuilder.Entity<Partner>(entity =>
         {
             entity.Property(e => e.PartnerName).IsFixedLength();
