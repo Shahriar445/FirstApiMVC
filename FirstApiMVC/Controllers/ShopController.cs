@@ -25,12 +25,24 @@ namespace FirstApiMVC.Controllers
 
         //----------------------------------------------Create Items --------------------------------------
         [HttpPost("/CreateItem")]
-        public async Task<IActionResult> CreateItem([FromBody] ItemDto itemdto)
+        public async Task<IActionResult> CreateItem( [FromBody] ItemDto itemdto, [FromForm] IFormFile imageFile)
         {
             try
             {
+                string imageUrl = null;
+                if (imageFile != null)
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", imageFile.FileName);
 
-                var result = await _shopRepo.CreateItem(itemdto);
+                    using (var stream =new FileStream(path, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+                    imageUrl =$"/images/ItemImage{imageFile.FileName}";
+                }
+                
+
+                var result = await _shopRepo.CreateItem(itemdto,imageUrl);
                 return StatusCode(StatusCodes.Status201Created, result);
             }
             catch (Exception e)

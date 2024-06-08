@@ -18,7 +18,7 @@ namespace FirstApiMVC.Repository
         }
 
         // single items 
-        public async Task<string> CreateItem(ItemDto item)
+        public async Task<string> CreateItem(ItemDto item,string imageUrl)
         {
             string message = "";
             try
@@ -36,7 +36,7 @@ namespace FirstApiMVC.Repository
                     data.ItemName = item.ItemName;
                     data.NumStockQuantity = item.NumStockQuantity;
                     data.IsActive = item.IsActive;
-
+                    data.ImageUrl = imageUrl; // image url mail model to dto
                     _context.Items.Update(data);
                     message = $"Item '{item.ItemName}' updated successfully.";
                 }
@@ -53,7 +53,8 @@ namespace FirstApiMVC.Repository
                     {
                         ItemName = item.ItemName,
                         NumStockQuantity = item.NumStockQuantity,
-                        IsActive = item.IsActive
+                        IsActive = item.IsActive,
+                        ImageUrl = imageUrl  // Set ImageUrl 
                     };
 
                     await _context.Items.AddAsync(newItem);

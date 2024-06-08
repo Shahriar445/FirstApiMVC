@@ -25,6 +25,7 @@
   <ItemGroup>
     <Folder Include="DbContexts\Models\" />
     <Folder Include="NewFolder\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

@@ -19,5 +19,7 @@ namespace FirstApiMVC.DTO
         public int? NumStockQuantity { get; set; }
 
         public bool? IsActive { get; set; }
+        //public string? ImageUrl { get; set; }
+       
     }
 }
