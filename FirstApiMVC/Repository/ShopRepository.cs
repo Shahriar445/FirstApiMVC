@@ -415,7 +415,9 @@ namespace FirstApiMVC.Repository
                                      ItemId = item.ItemId,
                                      ItemName = item.ItemName,
                                      NumStockQuantity = item.NumStockQuantity,
-                                     IsActive = item.IsActive
+                                     IsActive = item.IsActive,
+                                     ImageUrl= item.ImageUrl // for image 
+                                     
                                  })
                                  .ToListAsync();
         }

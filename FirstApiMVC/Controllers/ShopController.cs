@@ -39,7 +39,7 @@ namespace FirstApiMVC.Controllers
                     {
                         await itemDto.ImageFile.CopyToAsync(stream);
                     }
-                    imageUrl = $"/images{fileName}";
+                    imageUrl = $"/images/{fileName}";
                 }
 
                 var itemDtos = new ItemDto
