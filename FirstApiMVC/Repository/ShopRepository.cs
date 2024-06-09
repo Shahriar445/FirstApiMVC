@@ -18,7 +18,7 @@ namespace FirstApiMVC.Repository
         }
 
         // single items 
-        public async Task<string> CreateItem(ItemDto item,string imageUrl)
+        public async Task<string> CreateItem(ItemDto item, string imageUrl)
         {
             string message = "";
             try
@@ -67,7 +67,6 @@ namespace FirstApiMVC.Repository
             {
                 message = $"Error: {ex.Message}";
             }
-
             return message;
         }
 

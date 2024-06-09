@@ -25,24 +25,32 @@ namespace FirstApiMVC.Controllers
 
         //----------------------------------------------Create Items --------------------------------------
         [HttpPost("/CreateItem")]
-        public async Task<IActionResult> CreateItem( [FromBody] ItemDto itemdto, [FromForm] IFormFile imageFile)
+        public async Task<IActionResult> CreateItem([FromForm] ItemCreateDto itemDto)
         {
             try
             {
                 string imageUrl = null;
-                if (imageFile != null)
+                if (itemDto.ImageFile != null && itemDto.ImageFile.Length > 0)
                 {
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", imageFile.FileName);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(itemDto.ImageFile.FileName);
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
 
-                    using (var stream =new FileStream(path, FileMode.Create))
+                    using (var stream = new FileStream(path, FileMode.Create))
                     {
-                        await imageFile.CopyToAsync(stream);
+                        await itemDto.ImageFile.CopyToAsync(stream);
                     }
-                    imageUrl =$"/images/ItemImage{imageFile.FileName}";
+                    imageUrl = $"/images{fileName}";
                 }
-                
 
-                var result = await _shopRepo.CreateItem(itemdto,imageUrl);
+                var itemDtos = new ItemDto
+                {
+                    ItemName = itemDto.ItemName,
+                    NumStockQuantity = itemDto.NumStockQuantity,
+                    IsActive = itemDto.IsActive,
+                    ImageUrl = imageUrl
+                };
+
+                var result = await _shopRepo.CreateItem(itemDtos, imageUrl);
                 return StatusCode(StatusCodes.Status201Created, result);
             }
             catch (Exception e)
@@ -50,6 +58,7 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
+
 
 
         [HttpPost("/CreateItems")]
