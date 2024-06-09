@@ -38,17 +38,67 @@ public partial class ShopDbContext : DbContext
     {
         modelBuilder.Entity<Item>(entity =>
         {
-            entity.Property(e => e.ImageUrl).IsFixedLength();
+            entity.ToTable("Item");
+
+            entity.Property(e => e.FileUrl)
+                .HasMaxLength(250)
+                .IsFixedLength();
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(250)
+                .IsFixedLength()
+                .HasColumnName("imageURL");
+            entity.Property(e => e.ItemName)
+                .HasMaxLength(250)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Partner>(entity =>
         {
-            entity.Property(e => e.PartnerName).IsFixedLength();
+            entity.ToTable("Partner");
+
+            entity.Property(e => e.PartnerName)
+                .HasMaxLength(250)
+                .IsFixedLength();
         });
 
         modelBuilder.Entity<PartnerType>(entity =>
         {
-            entity.Property(e => e.PartnerTypeName).IsFixedLength();
+            entity.ToTable("PartnerType");
+
+            entity.Property(e => e.PartnerTypeId).HasColumnName("PartnerTypeID");
+            entity.Property(e => e.PartnerTypeName)
+                .HasMaxLength(250)
+                .IsFixedLength();
+        });
+
+        modelBuilder.Entity<Purchase>(entity =>
+        {
+            entity.ToTable("Purchase");
+
+            entity.Property(e => e.PurchaseId).HasColumnName("PurchaseID");
+            entity.Property(e => e.PurchaseDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PurchaseDetail>(entity =>
+        {
+            entity.HasKey(e => e.DetailsId);
+
+            entity.Property(e => e.ItemQuantity).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
+        });
+
+        modelBuilder.Entity<Sale>(entity =>
+        {
+            entity.HasKey(e => e.SalesId);
+
+            entity.Property(e => e.SalesDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<SalesDetail>(entity =>
+        {
+            entity.HasKey(e => e.DetailsId);
+
+            entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
         });
 
         OnModelCreatingPartial(modelBuilder);

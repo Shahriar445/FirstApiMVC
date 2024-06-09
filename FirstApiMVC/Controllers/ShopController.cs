@@ -30,6 +30,7 @@ namespace FirstApiMVC.Controllers
             try
             {
                 string imageUrl = null;
+                string fileUrl = null;
                 if (itemDto.ImageFile != null && itemDto.ImageFile.Length > 0)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(itemDto.ImageFile.FileName);
@@ -41,16 +42,28 @@ namespace FirstApiMVC.Controllers
                     }
                     imageUrl = $"/images/{fileName}";
                 }
+                if (itemDto.File != null && itemDto.File.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(itemDto.File.FileName);
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", fileName);
+
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await itemDto.File.CopyToAsync(stream);
+                    }
+                    fileUrl = $"/uploads/{fileName}";
+                }
 
                 var itemDtos = new ItemDto
                 {
                     ItemName = itemDto.ItemName,
                     NumStockQuantity = itemDto.NumStockQuantity,
                     IsActive = itemDto.IsActive,
+                    FileUrl = fileUrl,
                     ImageUrl = imageUrl
                 };
 
-                var result = await _shopRepo.CreateItem(itemDtos, imageUrl);
+                var result = await _shopRepo.CreateItem(itemDtos, imageUrl,fileUrl);
                 return StatusCode(StatusCodes.Status201Created, result);
             }
             catch (Exception e)
