@@ -30,6 +30,8 @@ public partial class ShopDbContext : DbContext
 
     public virtual DbSet<SalesDetail> SalesDetails { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=DESKTOP-PM9DUD3;Initial Catalog=Shop;Integrated Security=True;Trust Server Certificate=True");
@@ -99,6 +101,18 @@ public partial class ShopDbContext : DbContext
             entity.HasKey(e => e.DetailsId);
 
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("User");
+
+            entity.Property(e => e.Password)
+                .HasMaxLength(255)
+                .IsFixedLength();
+            entity.Property(e => e.Username)
+                .HasMaxLength(10)
+                .IsFixedLength();
         });
 
         OnModelCreatingPartial(modelBuilder);

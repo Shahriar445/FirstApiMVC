@@ -1,9 +1,9 @@
-﻿using FirstApiMVC.DBContexts.Models;
+﻿
 using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
-using Microsoft.AspNetCore.Http;
+using FirstApiMVC.jwttoken;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using System.Formats.Asn1;
 
 
 namespace FirstApiMVC.Controllers
@@ -16,12 +16,37 @@ namespace FirstApiMVC.Controllers
     {
         private static IShopRepository _shopRepo;
         private readonly ILogger<ShopController> _logger;
+        private readonly TokenService _tokenService;
 
-        public ShopController(ILogger<ShopController> logger, IShopRepository shopRepo)
+        public ShopController(ILogger<ShopController> logger, IShopRepository shopRepo,TokenService tokenService)
         {
             _logger = logger;
             _shopRepo = shopRepo;
+            _tokenService = tokenService;
         }
+        //----------------------------------------------Login api --------------------------------------
+
+        [HttpPost("/Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto _logindto)
+        {
+            try
+            {
+                // Replace with actual user validation logic
+                var user = await _shopRepo.GetUserByUsernameAsync(_logindto.Username);
+                if (user != null && user.Password == _logindto.Password) // Ensure to hash and compare passwords securely
+                {
+                    var token = _tokenService.GenerateToken(user.UserId.ToString());
+                    return Ok(new { Token = token });
+                }
+
+                return Unauthorized("Invalid username or password");
+            }
+            catch (Exception e)
+            {  
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+        
 
         //----------------------------------------------Create Items --------------------------------------
         [HttpPost("/CreateItem")]

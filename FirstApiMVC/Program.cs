@@ -2,7 +2,10 @@ using FirstApiMVC.DbContexts;
 using FirstApiMVC.DependencyContainer;
 using FirstApiMVC.IRepository;
 using FirstApiMVC.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Register your DbContext
 builder.Services.AddDbContext<ShopDbContext>();
 
+var secretKey = "your_secret_key_here"; // Use a secret key stored securely
 
 
 /*
@@ -44,20 +48,30 @@ DependencyInversion.RegisterServices(builder.Services);
 
 
 
+// JWT authentication configuration
+var key = Encoding.ASCII.GetBytes(secretKey);
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
 
 
 
 
 
 
-
-
-
-
-
-
-
-// service for fronted 
+// service for frontend 
 
 builder.Services.AddCors(options =>
 {
@@ -87,6 +101,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseStaticFiles(); // for image file 
+app.UseAuthentication(); // add authentication middleware 
 app.UseAuthorization();
 
 app.MapControllers();
