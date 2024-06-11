@@ -105,14 +105,16 @@ public partial class ShopDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
+            entity.HasKey(e => e.UserId).HasName("PK_User_");
+
             entity.ToTable("User");
 
             entity.Property(e => e.Password)
-                .HasMaxLength(255)
-                .IsFixedLength();
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Username)
-                .HasMaxLength(10)
-                .IsFixedLength();
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         OnModelCreatingPartial(modelBuilder);

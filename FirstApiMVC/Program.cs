@@ -1,6 +1,7 @@
 using FirstApiMVC.DbContexts;
 using FirstApiMVC.DependencyContainer;
 using FirstApiMVC.IRepository;
+using FirstApiMVC.jwttoken;
 using FirstApiMVC.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -14,42 +15,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-//Dependancy inversition 
 // Register your DbContext
 builder.Services.AddDbContext<ShopDbContext>();
-
-var secretKey = "your_secret_key_here"; // Use a secret key stored securely
-
-
-/*
-//Enviorment Set For Docker Container  
-
-var DbHost = Environment.GetEnvironmentVariable("DB_HOST");
-var DbName = Environment.GetEnvironmentVariable("DB_NAME");
-var DbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
-
-if (builder.Environment.IsDevelopment())
-{
-
-    builder.Services.AddDbContext<ShopDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-}
-else
-{
-
-    builder.Services.AddDbContext<ShopDbContext>(options =>
-     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
-*/
-
 // Register your repository through DependencyInversion 
 DependencyInversion.RegisterServices(builder.Services);
 
 
+var secretKey = "test_256_secret_key_32_character_need"; // Use a secret key stored securely
 
 // JWT authentication configuration
 var key = Encoding.ASCII.GetBytes(secretKey);
+builder.Services.AddSingleton(new TokenService(secretKey));
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

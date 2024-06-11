@@ -1,8 +1,8 @@
 ﻿
+using FirstApiMVC.DBContexts.Models;
 using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
 using FirstApiMVC.jwttoken;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -18,22 +18,45 @@ namespace FirstApiMVC.Controllers
         private readonly ILogger<ShopController> _logger;
         private readonly TokenService _tokenService;
 
-        public ShopController(ILogger<ShopController> logger, IShopRepository shopRepo,TokenService tokenService)
+        public ShopController(ILogger<ShopController> logger, IShopRepository shopRepo, TokenService tokenService)
         {
             _logger = logger;
             _shopRepo = shopRepo;
             _tokenService = tokenService;
         }
-        //----------------------------------------------Login api --------------------------------------
-
-        [HttpPost("/Login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto _logindto)
+        //----------------------------------------------REgister & login api --------------------------------------
+        [HttpPost("/Register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequest)
         {
             try
             {
-                // Replace with actual user validation logic
+                var existingUser = await _shopRepo.GetUserByUsernameAsync(registerRequest.Username);
+                if (existingUser != null)
+                {
+                    return BadRequest("Username already exists");
+                }
+
+                var user = new User
+                {
+                    Username = registerRequest.Username,
+                    Password = registerRequest.Password 
+                };
+
+                var createdUser = await _shopRepo.CreateUserAsync(user);
+                return StatusCode(StatusCodes.Status201Created, createdUser);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+        [HttpPost("/Login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto _logindto)
+        {
+            try
+            {
                 var user = await _shopRepo.GetUserByUsernameAsync(_logindto.Username);
-                if (user != null && user.Password == _logindto.Password) // Ensure to hash and compare passwords securely
+                if (user != null && user.Password == _logindto.Password) // Compare plain text passwords
                 {
                     var token = _tokenService.GenerateToken(user.UserId.ToString());
                     return Ok(new { Token = token });
@@ -42,11 +65,10 @@ namespace FirstApiMVC.Controllers
                 return Unauthorized("Invalid username or password");
             }
             catch (Exception e)
-            {  
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
-        
 
         //----------------------------------------------Create Items --------------------------------------
         [HttpPost("/CreateItem")]
@@ -88,7 +110,7 @@ namespace FirstApiMVC.Controllers
                     ImageUrl = imageUrl
                 };
 
-                var result = await _shopRepo.CreateItem(itemDtos, imageUrl,fileUrl);
+                var result = await _shopRepo.CreateItem(itemDtos, imageUrl, fileUrl);
                 return StatusCode(StatusCodes.Status201Created, result);
             }
             catch (Exception e)
@@ -96,7 +118,6 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
-
 
 
         [HttpPost("/CreateItems")]
@@ -130,11 +151,11 @@ namespace FirstApiMVC.Controllers
 
          }*/
 
-       
+
 
 
         [HttpGet("/GetAllItems")]
-        public async Task<IActionResult> GetAllItems(  )
+        public async Task<IActionResult> GetAllItems()
         {
             try
             {
@@ -149,7 +170,7 @@ namespace FirstApiMVC.Controllers
 
         // ---------------------------------Update items--------------------------------------------------- 
         [HttpPut("/UpdateItems")]
-        public async Task<IActionResult> UpdateItems( List<ItemDto> items)
+        public async Task<IActionResult> UpdateItems(List<ItemDto> items)
         {
             try
             {
@@ -161,9 +182,9 @@ namespace FirstApiMVC.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
-        
+
         // ---------------------------------Partner Detials  --------------------------------------------------- 
-       
+
         [HttpPost("/CreatePartner")]
         public async Task<IActionResult> CreatePartner(PartnerDto partnerDto)
         {
@@ -185,9 +206,10 @@ namespace FirstApiMVC.Controllers
             {
                 var result = await _shopRepo.PurchaseProduct(_purchase);
                 return StatusCode(StatusCodes.Status201Created, result);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -197,24 +219,24 @@ namespace FirstApiMVC.Controllers
             try
             {
                 var result = await _shopRepo.SalesProduct(_sale);
-                return StatusCode(StatusCodes.Status201Created,result);
+                return StatusCode(StatusCodes.Status201Created, result);
 
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
         [HttpGet("/DailyPurchase")]
-        
-        public async Task <IActionResult> GetDailyPurchaseReport(DateTime startDate, DateTime endDate)
+
+        public async Task<IActionResult> GetDailyPurchaseReport(DateTime startDate, DateTime endDate)
         {
             try
             {
-                var result = await _shopRepo.GetDailyPurchaseReport(startDate,  endDate);
+                var result = await _shopRepo.GetDailyPurchaseReport(startDate, endDate);
                 return Ok(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }

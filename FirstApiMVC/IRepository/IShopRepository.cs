@@ -17,6 +17,7 @@ namespace FirstApiMVC.IRepository
         Task<List<DailyPurchaseReportDto>> GetDailyPurchaseReport(DateTime startDate, DateTime endDate);
          Task<List<ItemDto>> GetAllItems();
         Task<User> GetUserByUsernameAsync(string username);
+        Task<User> CreateUserAsync(User user);
     }
 }
 
