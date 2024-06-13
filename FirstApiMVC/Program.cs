@@ -13,8 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-
-
 // Register your DbContext
 builder.Services.AddDbContext<ShopDbContext>();
 // Register your repository through DependencyInversion 
@@ -42,11 +40,6 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false
     };
 });
-
-
-
-
-
 
 // service for frontend 
 
