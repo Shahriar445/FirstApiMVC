@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System.Data;
 using System.Formats.Asn1;
 
@@ -448,56 +449,49 @@ namespace FirstApiMVC.Repository
             try
             {
                 var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                var dataTable = new DataTable();
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
                     var procName = "GetItemById";
-
                     using (var cmd = new SqlCommand(procName, connection))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@ItemId", itemId);
 
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (await reader.ReadAsync())
-                            {
-                                var item = new ItemDto
-                                {
-                                    ItemId = reader.GetInt32(reader.GetOrdinal("ItemId")),
-                                    ItemName = reader.GetString(reader.GetOrdinal("ItemName")),
-                                    NumStockQuantity = reader.GetInt32(reader.GetOrdinal("NumStockQuantity")),
-                                    IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
-                                    ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
-                                    FileUrl = reader.GetString(reader.GetOrdinal("FileUrl"))
-                                };
-
-                                return $"ItemId: {item.ItemId}, ItemName: {item.ItemName}, NumStockQuantity: {item.NumStockQuantity}, IsActive: {item.IsActive}, ImageUrl: {item.ImageUrl}, FileUrl: {item.FileUrl}";
-                            }
-                            else
-                            {
-                                return $"Item with ID {itemId} not found.";
-                            }
-                        }
+                        var da = new SqlDataAdapter(cmd);
+                        da.Fill(dataTable);
                     }
+                }
+
+                if (dataTable.Rows.Count > 0)
+                {
+                    //Convert DataTable to JSON string
+                    string jsonResult = JsonConvert.SerializeObject(dataTable);
+                    return jsonResult;
+                }
+                else
+                {
+                    return "No data returned from the stored procedure.";
                 }
             }
             catch (Exception ex)
             {
-                return $"Error retrieving item by ID: {ex.Message}";
+                return $"Error: {ex.Message}";
             }
         }
 
 
 
-    }
-
-
-
-
-
 
 }
+
+
+
+
+
+
+    }
 
 
 
