@@ -4,6 +4,9 @@ using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
 using FirstApiMVC.jwttoken;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System.Data;
 
 
 namespace FirstApiMVC.Controllers
@@ -242,6 +245,26 @@ namespace FirstApiMVC.Controllers
             }
 
         }
+
+
+        [HttpGet("/GetItem")]
+        public async Task<IActionResult> GetItem(int itemId)
+        {
+            try
+            {
+                var item = await _shopRepo.GetItemById(itemId);
+                if (item == null)
+                {
+                    return NotFound($"Item with ID {itemId} not found.");
+                }
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
 
     }
 

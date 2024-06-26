@@ -18,6 +18,7 @@ namespace FirstApiMVC.IRepository
          Task<List<ItemDto>> GetAllItems();
         Task<User> GetUserByUsernameAsync(string username);
         Task<User> CreateUserAsync(User user);
+        Task<string> GetItemById(int id);
     }
 }
 

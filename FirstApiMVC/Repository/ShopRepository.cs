@@ -4,7 +4,10 @@ using FirstApiMVC.DTO;
 using FirstApiMVC.IRepository;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Data;
 using System.Formats.Asn1;
 
 namespace FirstApiMVC.Repository
@@ -12,10 +15,13 @@ namespace FirstApiMVC.Repository
     public class ShopRepository : IShopRepository
     {
         private readonly ShopDbContext _context;
-        public ShopRepository(ShopDbContext context)
+        private readonly IConfiguration _configuration;
+        public ShopRepository(ShopDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration=configuration;
         }
+
 
         // single items 
         public async Task<string> CreateItem(ItemDto item, string imageUrl , string fileUrl)
@@ -136,7 +142,6 @@ namespace FirstApiMVC.Repository
             return message;
         }
 
-       
 
         
         // ---------------------------------Update list---------------------------------------
@@ -424,6 +429,8 @@ namespace FirstApiMVC.Repository
                                  })
                                  .ToListAsync();
         }
+
+       
         public async Task<User> GetUserByUsernameAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -435,8 +442,63 @@ namespace FirstApiMVC.Repository
             return user;
         }
 
+
+        public async Task<string> GetItemById(int itemId)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    var procName = "GetItemById";
+
+                    using (var cmd = new SqlCommand(procName, connection))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@ItemId", itemId);
+
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                var item = new ItemDto
+                                {
+                                    ItemId = reader.GetInt32(reader.GetOrdinal("ItemId")),
+                                    ItemName = reader.GetString(reader.GetOrdinal("ItemName")),
+                                    NumStockQuantity = reader.GetInt32(reader.GetOrdinal("NumStockQuantity")),
+                                    IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
+                                    ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                                    FileUrl = reader.GetString(reader.GetOrdinal("FileUrl"))
+                                };
+
+                                return $"ItemId: {item.ItemId}, ItemName: {item.ItemName}, NumStockQuantity: {item.NumStockQuantity}, IsActive: {item.IsActive}, ImageUrl: {item.ImageUrl}, FileUrl: {item.FileUrl}";
+                            }
+                            else
+                            {
+                                return $"Item with ID {itemId} not found.";
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error retrieving item by ID: {ex.Message}";
+            }
+        }
+
+
+
     }
+
+
+
+
+
+
 }
+
 
 
 
