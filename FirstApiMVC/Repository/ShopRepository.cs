@@ -449,7 +449,7 @@ namespace FirstApiMVC.Repository
             try
             {
                 var connectionString = _configuration.GetConnectionString("DefaultConnection");
-                var dataTable = new DataTable();
+                var dataTable = new DataTable(); // data table 
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
@@ -485,11 +485,6 @@ namespace FirstApiMVC.Repository
 
 
 }
-
-
-
-
-
 
     }
 
